@@ -124,7 +124,6 @@ export class Application extends ChildableComponent<
      * @param options  The desired options to set.
      */
     bootstrap(options: Partial<TypeDocOptions> = {}): void {
-
         const overRideOptions = () => {
             for (const [key, val] of Object.entries(options)) {
                 try {
@@ -134,16 +133,16 @@ export class Application extends ChildableComponent<
                     this.logger.error(error.message);
                 }
             }
-        }
-        this.trigger(ApplicationEvents.BEGIN, this, options);        
+        };
+        this.trigger(ApplicationEvents.BEGIN, this, options);
         this.options.reset();
-        
+
         let readers: OptionsReader[] = [];
         this.trigger(ApplicationEvents.READER_INIT, this, readers);
-        readers.forEach(reader => reader.read(this.options, this.logger));
+        readers.forEach((reader) => reader.read(this.options, this.logger));
         overRideOptions();
 
-        const logger = this.options.getValue('logger') || "none"
+        const logger = this.options.getValue("logger") || "none";
         if (typeof logger === "function") {
             this.logger = new CallbackLogger(<any>logger);
             this.options.setLogger(this.logger);
@@ -155,17 +154,15 @@ export class Application extends ChildableComponent<
 
         readers = [];
         this.trigger(ApplicationEvents.READER_PLUGINS, this, readers);
-        readers.forEach(reader => reader.read(this.options, this.logger));
+        readers.forEach((reader) => reader.read(this.options, this.logger));
         overRideOptions();
 
         const plugins = discoverPlugins(this);
         loadPlugins(this, plugins);
 
-        
-
         readers = [];
         this.trigger(ApplicationEvents.READER_ARGS, this, readers);
-        readers.forEach(reader => reader.read(this.options, this.logger));
+        readers.forEach((reader) => reader.read(this.options, this.logger));
         overRideOptions();
 
         if (hasBeenLoadedMultipleTimes()) {

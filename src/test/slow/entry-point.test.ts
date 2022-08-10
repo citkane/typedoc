@@ -25,10 +25,9 @@ describe.skip("Entry Points", () => {
 
     const app = new Application();
     const tsconfig = join(fixture.cwd, "tsconfig.json");
-    app.on(
-        ApplicationEvents.READER_INIT,
-        (app, readers) => readers.push(new TSConfigReader())
-    )
+    app.on(ApplicationEvents.READER_INIT, (_app: Application, readers: TSConfigReader[]) =>
+        readers.push(new TSConfigReader())
+    );
 
     it("Supports expanding existing paths", () => {
         app.bootstrap({

@@ -52,7 +52,7 @@ describe("Options - ArgumentsReader", () => {
             logger.resetErrors();
             logger.resetWarnings();
             options.reset();
-            reader.read(options, logger)
+            reader.read(options, logger);
             cb();
         });
     }
@@ -135,7 +135,7 @@ describe("Options - ArgumentsReader", () => {
         }
         const reader = new ArgumentsReader(["--badOption"]);
         options.reset();
-        reader.read(options, new TestLogger())
+        reader.read(options, new TestLogger());
         equal(check, true, "Reader did not report an error.");
     });
 

@@ -6,8 +6,6 @@ import {
 } from "../../lib/utils/array";
 
 describe("Array utils", () => {
-
-
     describe("insertOrderSorted", () => {
         const item1 = { order: 1 };
         const item2 = { order: 2 };

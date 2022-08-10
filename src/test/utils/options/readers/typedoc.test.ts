@@ -39,7 +39,7 @@ describe("Options - TypeDocReader", () => {
         project.write();
         options.reset();
         options.setValue("options", project.cwd);
-        reader.read(options,logger);
+        reader.read(options, logger);
         project.rm();
 
         logger.expectNoOtherMessages();

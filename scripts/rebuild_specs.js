@@ -13,10 +13,9 @@ const { ApplicationEvents } = require("../dist/lib/application-events");
 const base = path.join(__dirname, "../src/test/converter");
 
 const app = new TypeDoc.Application();
-app.on(
-    ApplicationEvents.READER_INIT,
-    (app, readers) => readers.push(new TypeDoc.TSConfigReader())
-)
+app.on(ApplicationEvents.READER_INIT, (app, readers) =>
+    readers.push(new TypeDoc.TSConfigReader())
+);
 
 app.bootstrap({
     name: "typedoc",

@@ -58,10 +58,9 @@ class PQueue {
 
 export async function captureRegressionScreenshots() {
     const app = new Application();
-    app.on(
-        ApplicationEvents.READER_INIT,
-        (app, readers) => readers.push(new TSConfigReader())
-    )
+    app.on(ApplicationEvents.READER_INIT, (_app: Application, readers: TSConfigReader[]) =>
+        readers.push(new TSConfigReader())
+    );
     app.bootstrap({
         logger: "console",
         readme: join(src, "..", "README.md"),

@@ -22,10 +22,9 @@ export function getConverterBase() {
 export function getConverterApp() {
     if (!converterApp) {
         converterApp = new Application();
-        converterApp.on(
-            ApplicationEvents.READER_INIT,
-            (app, readers) => readers.push(new TSConfigReader())
-        )
+        converterApp.on(ApplicationEvents.READER_INIT, (_app:Application, readers: TSConfigReader[]) =>
+            readers.push(new TSConfigReader())
+        );
         converterApp.bootstrap({
             logger: "none",
             name: "typedoc",
@@ -82,10 +81,9 @@ export function getConverter2Base() {
 export function getConverter2App() {
     if (!converter2App) {
         converter2App = new Application();
-        converter2App.on(
-            ApplicationEvents.READER_INIT,
-            (app, readers) => readers.push(new TSConfigReader())
-        )
+        converter2App.on(ApplicationEvents.READER_INIT, (_app: Application, readers: TSConfigReader[]) =>
+            readers.push(new TSConfigReader())
+        );
         converter2App.bootstrap({
             excludeExternals: true,
             tsconfig: join(getConverter2Base(), "tsconfig.json"),
