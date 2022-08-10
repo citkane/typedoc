@@ -13,6 +13,7 @@ import {
     writeFile,
     discoverPlugins,
     TSConfigReader,
+    OptionsReader,
 } from "./utils/index";
 
 import {
@@ -20,7 +21,7 @@ import {
     ChildableComponent,
     Component,
 } from "./utils/component";
-import { Options, BindOption } from "./utils";
+import { Options } from "./utils";
 import type { TypeDocOptions } from "./utils/options/declaration";
 import { unique } from "./utils/array";
 import { ok } from "assert";
@@ -35,6 +36,8 @@ import { hasBeenLoadedMultipleTimes } from "./utils/general";
 import { validateExports } from "./validation/exports";
 import { validateDocumentation } from "./validation/documentation";
 import { validateLinks } from "./validation/links";
+import { ApplicationEvents } from "./application-events";
+//import { addTypeDocOptions } from "./utils/options/sources";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageInfo = require("../../package.json") as {
@@ -87,13 +90,17 @@ export class Application extends ChildableComponent<
     options: Options;
 
     /** @internal */
-    @BindOption("logger")
-    loggerType!: string | Function;
+    //@BindOption("logger")
+    //loggerType!: string | Function;
 
     /**
      * The version number of TypeDoc.
      */
     static VERSION = packageInfo.version;
+
+    static readonly BEGIN = ApplicationEvents.BEGIN;
+
+    static readonly END = ApplicationEvents.END;
 
     /**
      * Create a new TypeDoc application instance.
@@ -117,16 +124,26 @@ export class Application extends ChildableComponent<
      * @param options  The desired options to set.
      */
     bootstrap(options: Partial<TypeDocOptions> = {}): void {
-        for (const [key, val] of Object.entries(options)) {
-            try {
-                this.options.setValue(key as keyof TypeDocOptions, val);
-            } catch {
-                // Ignore errors, plugins haven't been loaded yet and may declare an option.
+
+        const overRideOptions = () => {
+            for (const [key, val] of Object.entries(options)) {
+                try {
+                    this.options.setValue(key as keyof TypeDocOptions, val);
+                } catch (error) {
+                    ok(error instanceof Error);
+                    this.logger.error(error.message);
+                }
             }
         }
-        this.options.read(new Logger());
+        this.trigger(ApplicationEvents.BEGIN, this, options);        
+        this.options.reset();
+        
+        let readers: OptionsReader[] = [];
+        this.trigger(ApplicationEvents.READER_INIT, this, readers);
+        readers.forEach(reader => reader.read(this.options, this.logger));
+        overRideOptions();
 
-        const logger = this.loggerType;
+        const logger = this.options.getValue('logger') || "none"
         if (typeof logger === "function") {
             this.logger = new CallbackLogger(<any>logger);
             this.options.setLogger(this.logger);
@@ -136,25 +153,27 @@ export class Application extends ChildableComponent<
         }
         this.logger.level = this.options.getValue("logLevel");
 
+        readers = [];
+        this.trigger(ApplicationEvents.READER_PLUGINS, this, readers);
+        readers.forEach(reader => reader.read(this.options, this.logger));
+        overRideOptions();
+
         const plugins = discoverPlugins(this);
         loadPlugins(this, plugins);
 
-        this.options.reset();
-        for (const [key, val] of Object.entries(options)) {
-            try {
-                this.options.setValue(key as keyof TypeDocOptions, val);
-            } catch (error) {
-                ok(error instanceof Error);
-                this.logger.error(error.message);
-            }
-        }
-        this.options.read(this.logger);
+        
+
+        readers = [];
+        this.trigger(ApplicationEvents.READER_ARGS, this, readers);
+        readers.forEach(reader => reader.read(this.options, this.logger));
+        overRideOptions();
 
         if (hasBeenLoadedMultipleTimes()) {
             this.logger.warn(
                 `TypeDoc has been loaded multiple times. This is commonly caused by plugins which have their own installation of TypeDoc. This will likely break things.`
             );
         }
+        this.trigger(ApplicationEvents.END, this, options);
     }
 
     /**

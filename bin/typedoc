@@ -13,15 +13,20 @@ const ExitCodes = {
     ExceptionThrown: 6,
 };
 
-const td = require("..");
+const td  = require("..");
 const { getOptionsHelp } = require("../dist/lib/utils/options/help");
+const { ApplicationEvents } = require("../dist/lib/application-events");
 
 const app = new td.Application();
 
-app.options.addReader(new td.ArgumentsReader(0));
-app.options.addReader(new td.TypeDocReader());
-app.options.addReader(new td.TSConfigReader());
-app.options.addReader(new td.ArgumentsReader(300));
+app.on(ApplicationEvents.READER_INIT, (app, readers) => {
+    readers.push(new td.ArgumentsReader());
+    readers.push(new td.TypeDocReader());
+    readers.push(new td.TSConfigReader());
+})
+app.on(ApplicationEvents.READER_ARGS, (app, readers) => {
+    readers.push(new td.ArgumentsReader());
+})
 
 app.bootstrap();
 

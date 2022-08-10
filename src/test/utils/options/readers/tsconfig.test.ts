@@ -10,7 +10,7 @@ import { tmpdir } from "os";
 describe("Options - TSConfigReader", () => {
     const options = new Options(new Logger());
     options.addDefaultDeclarations();
-    options.addReader(new TSConfigReader());
+    const reader = new TSConfigReader();
     const logger = new TestLogger();
 
     function readWithProject(project: Project, reset = true) {
@@ -20,7 +20,7 @@ describe("Options - TSConfigReader", () => {
         logger.reset();
         options.setValue("tsconfig", project.cwd);
         project.write();
-        options.read(logger);
+        reader.read(options, logger);
         project.rm();
     }
 
@@ -32,7 +32,7 @@ describe("Options - TSConfigReader", () => {
             "tsconfig",
             join(tmpdir(), "typedoc/does-not-exist.json")
         );
-        options.read(logger);
+        reader.read(options, logger);
         logger.expectMessage("error: *");
     });
 
@@ -88,8 +88,8 @@ describe("Options - TSConfigReader", () => {
             "tsconfig",
             join(__dirname, "data/does_not_exist.json")
         );
-        options.addReader(new TSConfigReader());
-        options.read(logger);
+        const reader = new TSConfigReader();
+        reader.read(options, logger);
         equal(logger.hasErrors(), false);
     });
 

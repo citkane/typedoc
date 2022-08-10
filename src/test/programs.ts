@@ -7,6 +7,7 @@ import {
     SourceReference,
     TSConfigReader,
 } from "..";
+import { ApplicationEvents } from "../lib/application-events";
 import type { ModelToObject } from "../lib/serialization/schema";
 
 let converterApp: Application | undefined;
@@ -21,7 +22,10 @@ export function getConverterBase() {
 export function getConverterApp() {
     if (!converterApp) {
         converterApp = new Application();
-        converterApp.options.addReader(new TSConfigReader());
+        converterApp.on(
+            ApplicationEvents.READER_INIT,
+            (app, readers) => readers.push(new TSConfigReader())
+        )
         converterApp.bootstrap({
             logger: "none",
             name: "typedoc",
@@ -78,7 +82,10 @@ export function getConverter2Base() {
 export function getConverter2App() {
     if (!converter2App) {
         converter2App = new Application();
-        converter2App.options.addReader(new TSConfigReader());
+        converter2App.on(
+            ApplicationEvents.READER_INIT,
+            (app, readers) => readers.push(new TSConfigReader())
+        )
         converter2App.bootstrap({
             excludeExternals: true,
             tsconfig: join(getConverter2Base(), "tsconfig.json"),

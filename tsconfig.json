@@ -46,7 +46,8 @@
         "src/test/module",
         "src/test/packages",
         "src/test/slow/entry-points",
-        "src/test/renderer/testProject"
+        "src/test/renderer/testProject",
+        "src/test/**/*"
     ],
     // We use ts-node to support mocha runner directly on files
     "ts-node": {

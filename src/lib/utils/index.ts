@@ -1,6 +1,5 @@
 export {
     filterMap,
-    insertPrioritySorted,
     partition,
     removeIf,
     removeIfPresent,

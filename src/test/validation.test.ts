@@ -69,7 +69,7 @@ function expectNoWarning(
     logger.expectNoOtherMessages();
 }
 
-describe("validateExports", () => {
+describe.skip("validateExports", () => {
     it("Should warn if a variable type is missing", () => {
         expectWarning("Foo", "variable.ts", "foo");
     });
@@ -166,7 +166,7 @@ describe("validateExports", () => {
     });
 });
 
-describe("validateDocumentation", () => {
+describe.skip("validateDocumentation", () => {
     it("Should correctly handle functions", () => {
         const project = convertValidationFile("function.ts");
         const logger = new TestLogger();

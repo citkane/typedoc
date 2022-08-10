@@ -2,6 +2,7 @@ import * as fs from "fs";
 import { platform } from "os";
 import { resolve, join, dirname, relative } from "path";
 import { Application, TSConfigReader, EntryPointStrategy } from "..";
+import { ApplicationEvents } from "../lib/application-events";
 import { glob } from "../lib/utils/fs";
 
 // The @types package plays badly with non-dom packages.
@@ -57,7 +58,10 @@ class PQueue {
 
 export async function captureRegressionScreenshots() {
     const app = new Application();
-    app.options.addReader(new TSConfigReader());
+    app.on(
+        ApplicationEvents.READER_INIT,
+        (app, readers) => readers.push(new TSConfigReader())
+    )
     app.bootstrap({
         logger: "console",
         readme: join(src, "..", "README.md"),

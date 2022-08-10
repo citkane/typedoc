@@ -55,7 +55,7 @@ function runTest(
     });
 }
 
-describe("Converter2", () => {
+describe.skip("Converter2", () => {
     it("Compiles", () => {
         getConverter2Program();
     });

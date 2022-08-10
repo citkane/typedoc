@@ -48,12 +48,11 @@ describe("Options - ArgumentsReader", () => {
 
     function test(name: string, args: string[], cb: () => void) {
         it(name, () => {
-            const reader = new ArgumentsReader(1, args);
+            const reader = new ArgumentsReader(args);
             logger.resetErrors();
             logger.resetWarnings();
             options.reset();
-            options.addReader(reader);
-            options.read(logger);
+            reader.read(options, logger)
             cb();
         });
     }
@@ -134,10 +133,9 @@ describe("Options - ArgumentsReader", () => {
                 check = true;
             }
         }
-        const reader = new ArgumentsReader(1, ["--badOption"]);
+        const reader = new ArgumentsReader(["--badOption"]);
         options.reset();
-        options.addReader(reader);
-        options.read(new TestLogger());
+        reader.read(options, new TestLogger())
         equal(check, true, "Reader did not report an error.");
     });
 
@@ -150,10 +148,9 @@ describe("Options - ArgumentsReader", () => {
             }
         }
 
-        const reader = new ArgumentsReader(1, ["--out"]);
+        const reader = new ArgumentsReader(["--out"]);
         options.reset();
-        options.addReader(reader);
-        options.read(new TestLogger());
+        reader.read(options, new TestLogger());
         equal(check, true, "Reader did not report an error.");
     });
 

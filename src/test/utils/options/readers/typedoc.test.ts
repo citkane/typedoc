@@ -8,7 +8,7 @@ import { TestLogger } from "../../../TestLogger";
 describe("Options - TypeDocReader", () => {
     const options = new Options(new Logger());
     options.addDefaultDeclarations();
-    options.addReader(new TypeDocReader());
+    const reader = new TypeDocReader();
 
     it("Supports comments in json", () => {
         const project = fsProject("jsonc");
@@ -18,7 +18,7 @@ describe("Options - TypeDocReader", () => {
         project.write();
         options.reset();
         options.setValue("options", project.cwd);
-        options.read(logger);
+        reader.read(options, logger);
         project.rm();
 
         logger.expectNoOtherMessages();
@@ -39,7 +39,7 @@ describe("Options - TypeDocReader", () => {
         project.write();
         options.reset();
         options.setValue("options", project.cwd);
-        options.read(logger);
+        reader.read(options,logger);
         project.rm();
 
         logger.expectNoOtherMessages();
@@ -55,7 +55,7 @@ describe("Options - TypeDocReader", () => {
         project.write();
         options.reset();
         options.setValue("options", project.cwd);
-        options.read(logger);
+        reader.read(options, logger);
         project.rm();
 
         logger.expectNoOtherMessages();
@@ -66,7 +66,7 @@ describe("Options - TypeDocReader", () => {
         options.reset();
         options.setValue("options", "./non-existent-file.json");
         const logger = new TestLogger();
-        options.read(logger);
+        reader.read(options, logger);
         logger.expectMessage(
             "error: The options file */non-existent-file.json does not exist."
         );
@@ -92,7 +92,7 @@ describe("Options - TypeDocReader", () => {
             options.setValue("options", project.cwd);
             const logger = new TestLogger();
             project.write();
-            options.read(logger);
+            reader.read(options, logger);
             project.rm();
             logger.expectMessage(message);
         });
@@ -144,9 +144,9 @@ describe("Options - TypeDocReader", () => {
         })(new Logger());
 
         options.addDefaultDeclarations();
-        options.addReader(new TypeDocReader());
+        const reader = new TypeDocReader();
         const logger = new Logger();
-        options.read(logger);
+        reader.read(options, logger);
         equal(logger.hasErrors(), false);
     });
 });

@@ -2,7 +2,7 @@ import type * as ts from "typescript";
 import { ParameterType } from "./declaration";
 import type { NeverIfInternal } from "..";
 import type { Application } from "../../..";
-import { insertPrioritySorted, unique } from "../array";
+import { unique } from "../array";
 import type { Logger } from "../loggers";
 import {
     convert,
@@ -20,19 +20,6 @@ import { addTypeDocOptions } from "./sources";
  * TypeDoc format.
  */
 export interface OptionsReader {
-    /**
-     * Readers will be processed according to their priority.
-     * A higher priority indicates that the reader should be called *later* so that
-     * it can override options set by lower priority readers.
-     *
-     * Note that to preserve expected behavior, the argv reader must have both the lowest
-     * priority so that it may set the location of config files used by other readers and
-     * the highest priority so that it can override settings from lower priority readers.
-     *
-     * Note: In 0.23. `priority` will be renamed to `order`, with the same meaning
-     */
-    priority: number;
-
     /**
      * The name of this reader so that it may be removed by plugins without the plugin
      * accessing the instance performing the read. Multiple readers may have the same
@@ -83,7 +70,6 @@ const optionSnapshots = new WeakMap<
  *    files.
  */
 export class Options {
-    private _readers: OptionsReader[] = [];
     private _declarations = new Map<string, Readonly<DeclarationOption>>();
     private _values: Record<string, unknown> = {};
     private _setOptions = new Set<string>();
@@ -174,21 +160,6 @@ export class Options {
             this._setOptions.clear();
             this._compilerOptions = {};
             this._fileNames = [];
-        }
-    }
-
-    /**
-     * Adds an option reader that will be used to read configuration values
-     * from the command line, configuration files, or other locations.
-     * @param reader
-     */
-    addReader(reader: OptionsReader): void {
-        insertPrioritySorted(this._readers, reader);
-    }
-
-    read(logger: Logger) {
-        for (const reader of this._readers) {
-            reader.read(this, logger);
         }
     }
 

@@ -8,11 +8,16 @@ const TypeDoc = require("..");
 const { getExpandedEntryPointsForPaths } = require("../dist/lib/utils");
 const { ok } = require("assert");
 const { SourceReference } = require("..");
+const { ApplicationEvents } = require("../dist/lib/application-events");
 
 const base = path.join(__dirname, "../src/test/converter");
 
 const app = new TypeDoc.Application();
-app.options.addReader(new TypeDoc.TSConfigReader());
+app.on(
+    ApplicationEvents.READER_INIT,
+    (app, readers) => readers.push(new TypeDoc.TSConfigReader())
+)
+
 app.bootstrap({
     name: "typedoc",
     excludeExternals: true,
